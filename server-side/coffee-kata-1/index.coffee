@@ -42,11 +42,12 @@ exports.default = kata_api_fncn
 
 loader_api = {}
 
+
+
 loader_api.authors = ({ blob }) ->
     # c blob
     authors_rayy = blob.split '\n'
     _.map authors_rayy, (val, k) ->
-        # c v, '...'
         [ email, firstname, lastname ] = val.split(';')
         pack.authors[email] =
             email: email
@@ -54,7 +55,6 @@ loader_api.authors = ({ blob }) ->
             lastname: lastname
 
 loader_api.books = ({ blob }) ->
-    c blob
     books_rayy = blob.split '\n'
     _.map books_rayy, (val, idx) ->
         [ title, isbn, authors, description ] = val.split(';')
@@ -66,6 +66,15 @@ loader_api.books = ({ blob }) ->
 
 
 loader_api.magazines = ({ blob }) ->
+    magazines_rayy = blob.split '\n'
+    _.map magazines_rayy, (val, idx) ->
+        c val
+        [ title, isbn, authors, publishedAt ] = val.split(';')
+        pack.magazines[isbn] =
+            isbn: isbn
+            title: title
+            authors: authors
+            publishedAt: publishedAt
 
 
 setup_and_load = ->

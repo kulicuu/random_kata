@@ -47895,9 +47895,196 @@ exports["default"] = connect(map_state_to_props, map_dispatch_to_props)(comp);
 /* 253 */
 /***/ (function(module, exports) {
 
-var authors_table, books_table, comp, magazines_table, map_dispatch_to_props, map_state_to_props;
+var authors_table, books_table, comp, find_book_or_mag_pane, keys_books, keys_mags, magazines_table, map_dispatch_to_props, map_state_to_props;
 
-magazines_table = function(props, state) {};
+keys_books = null;
+
+keys_mags = null;
+
+find_book_or_mag_pane = function(props, state, setState) {
+  var book, idx, mag;
+  return div({
+    style: {
+      display: 'flex',
+      backgroundColor: 'lightgrey'
+    }
+  }, input({
+    type: 'text',
+    placeholder: 'isbn',
+    onChange: function(e) {
+      var books_matches, candide_isbn, len, mags_matches, total_rayy;
+      candide_isbn = e.currentTarget.value;
+      len = candide_isbn.length;
+      total_rayy = keys_mags.concat(keys_books);
+      c(total_rayy);
+      books_matches = _.reduce(keys_books, function(acc, v, idx) {
+        c(acc, v, idx);
+        if (v.substring(0, len) === candide_isbn) {
+          acc.push(props.books[v]);
+          return acc;
+        } else {
+          return acc;
+        }
+      }, []);
+      mags_matches = _.reduce(keys_mags, function(acc, v, idx) {
+        if (v.substring(0, len) === candide_isbn) {
+          acc.push(props.magazines[v]);
+          return acc;
+        } else {
+          return acc;
+        }
+      }, []);
+      c(mags_matches);
+      c(books_matches);
+      return setState({
+        mags_matches: mags_matches,
+        books_matches: books_matches
+      });
+    }
+  }), div({
+    style: {
+      display: 'flex'
+    }
+  }, h6({
+    style: {
+      fontSize: 8
+    }
+  }, 'magazine matches'), (function() {
+    var i, len1, ref, results;
+    ref = state.mags_matches;
+    results = [];
+    for (idx = i = 0, len1 = ref.length; i < len1; idx = ++i) {
+      mag = ref[idx];
+      results.push(p({
+        key: "book_match" + idx,
+        style: {
+          fontSize: 7
+        }
+      }, mag.title));
+    }
+    return results;
+  })(), h6({
+    style: {
+      fontSize: 8
+    }
+  }, 'book matches'), (function() {
+    var i, len1, ref, results;
+    ref = state.books_matches;
+    results = [];
+    for (idx = i = 0, len1 = ref.length; i < len1; idx = ++i) {
+      book = ref[idx];
+      results.push(p({
+        key: "book_match" + idx,
+        style: {
+          fontSize: 7
+        }
+      }, book.title));
+    }
+    return results;
+  })()));
+};
+
+magazines_table = function(props, state) {
+  var authors, isbn, mag, publishedAt, title;
+  return div({
+    style: {
+      display: 'flex',
+      backgroundColor: 'magenta'
+    }
+  }, div({
+    style: {
+      backgroundColor: 'grey',
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'no-wrap',
+      width: '100%'
+    }
+  }, div({
+    style: {
+      display: 'flex',
+      flexDirection: 'row',
+      flexGrow: 0
+    }
+  }, div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "Title"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "Authors"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "ISBN"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "Published at")), (function() {
+    var ref, results;
+    ref = props.magazines;
+    results = [];
+    for (isbn in ref) {
+      mag = ref[isbn];
+      if (isbn !== 'isbn') {
+        authors = mag.authors, isbn = mag.isbn, publishedAt = mag.publishedAt, title = mag.title;
+        results.push(div({
+          key: "book:" + isbn,
+          style: {
+            display: 'flex',
+            flexDirection: 'row',
+            flexGrow: 0,
+            fontSize: 8
+          }
+        }, div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, title), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, authors), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, isbn), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, publishedAt)));
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  })()));
+};
 
 authors_table = function(props, state) {
   var author, email, firstname, lastname;
@@ -48090,8 +48277,19 @@ books_table = function(props, state) {
 };
 
 comp = rr({
+  componentWillReceiveProps: function(props, state) {
+    if (_.includes(_.keys(props), 'books')) {
+      keys_books = _.keys(props.books);
+    }
+    if (_.includes(_.keys(props), 'magazines')) {
+      return keys_mags = _.keys(props.magazines);
+    }
+  },
   getInitialState: function() {
-    return {};
+    return {
+      mags_matches: [],
+      books_matches: []
+    };
   },
   componentWillMount: function() {
     this.props.get_books();
@@ -48106,7 +48304,7 @@ comp = rr({
         height: '100%',
         width: '100%'
       }
-    }, h6(null, 'books'), books_table(this.props, this.state), h6(null, 'authors'), authors_table(this.props, this.state));
+    }, h6(null, 'books'), books_table(this.props, this.state), h6(null, 'authors'), authors_table(this.props, this.state), h6(null, 'magazines'), magazines_table(this.props, this.state), h6(null, 'find book or mag'), find_book_or_mag_pane(this.props, this.state, this.setState.bind(this)));
   }
 });
 
