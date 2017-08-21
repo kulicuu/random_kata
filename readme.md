@@ -1,6 +1,8 @@
 
 # a random kata adapted from my autocorrect/spellcheck project
 
+https://github.com/kulicuu/autocomplete_and_cetera
+
 #### prereqs
 
 - there should be a redis server running locally.
