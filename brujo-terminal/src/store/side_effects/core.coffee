@@ -18,6 +18,12 @@ arq = {}
 #         payload: desire.payload
 
 
+arq['get_books'] = ({ desire, state }) ->
+    primus.write
+        type: 'get_books'
+        payload: null
+
+
 arq['apply_parse_build_data_structure'] = ({ desire, state }) ->
     primus.write
         type: 'apply_parse_build_data_structure'

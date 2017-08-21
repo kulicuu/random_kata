@@ -43,6 +43,14 @@ arq = {}
 concord_channel = {}
 
 
+concord_channel['get_authors_and_magazines_response'] = ({ state, action, data }) ->
+    state = state.set 'authors', data.payload.authors
+    state = state.set 'magazines', data.payload.magazines
+    state
+
+
+concord_channel.get_books_response = ({ state, action, data }) ->
+    state.set 'books', data.payload
 
 
 concord_channel['dctn_initial_blob'] = ({ state, action, data }) ->
@@ -71,27 +79,34 @@ arq['primus:data'] = ({ state, action }) ->
 
 
 
-arq['apply_parse_build_data_structure'] = ({ state, action }) ->
+
+arq['get_books'] = ({ state, action }) ->
     state.setIn ['desires', shortid()],
-        type: 'apply_parse_build_data_structure'
-        payload: action.payload
+        type: 'get_books'
+        payload: null
 
 
-arq['browse_dctn'] = ({ state, action }) ->
-    state.setIn ['desires', shortid()],
-        type: 'browse_dctn'
-        payload: action.payload
-
-arq['get_raw_dctns_list'] = ({ state, action }) ->
-    state = state.setIn ['desires', shortid()],
-        type: 'get_raw_dctns_list'
-    state.setIn ['get_dctns_list_state'], 'sent_request'
-
-arq['lookup_prefix'] = ({ state, action }) ->
-    # { prefix_text } = action.payload
-    state.setIn ['desires', shortid()],
-        type: 'lookup_prefix'
-        payload: action.payload
+# arq['apply_parse_build_data_structure'] = ({ state, action }) ->
+#     state.setIn ['desires', shortid()],
+#         type: 'apply_parse_build_data_structure'
+#         payload: action.payload
+#
+#
+# arq['browse_dctn'] = ({ state, action }) ->
+#     state.setIn ['desires', shortid()],
+#         type: 'browse_dctn'
+#         payload: action.payload
+#
+# arq['get_raw_dctns_list'] = ({ state, action }) ->
+#     state = state.setIn ['desires', shortid()],
+#         type: 'get_raw_dctns_list'
+#     state.setIn ['get_dctns_list_state'], 'sent_request'
+#
+# arq['lookup_prefix'] = ({ state, action }) ->
+#     # { prefix_text } = action.payload
+#     state.setIn ['desires', shortid()],
+#         type: 'lookup_prefix'
+#         payload: action.payload
 
 
 

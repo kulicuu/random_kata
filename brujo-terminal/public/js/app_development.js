@@ -47633,6 +47633,20 @@ arq = {};
 
 concord_channel = {};
 
+concord_channel['get_authors_and_magazines_response'] = function(arg) {
+  var action, data, state;
+  state = arg.state, action = arg.action, data = arg.data;
+  state = state.set('authors', data.payload.authors);
+  state = state.set('magazines', data.payload.magazines);
+  return state;
+};
+
+concord_channel.get_books_response = function(arg) {
+  var action, data, state;
+  state = arg.state, action = arg.action, data = arg.data;
+  return state.set('books', data.payload);
+};
+
 concord_channel['dctn_initial_blob'] = function(arg) {
   var action, data, state;
   state = arg.state, action = arg.action, data = arg.data;
@@ -47669,39 +47683,12 @@ arq['primus:data'] = function(arg) {
   }
 };
 
-arq['apply_parse_build_data_structure'] = function(arg) {
+arq['get_books'] = function(arg) {
   var action, state;
   state = arg.state, action = arg.action;
   return state.setIn(['desires', shortid()], {
-    type: 'apply_parse_build_data_structure',
-    payload: action.payload
-  });
-};
-
-arq['browse_dctn'] = function(arg) {
-  var action, state;
-  state = arg.state, action = arg.action;
-  return state.setIn(['desires', shortid()], {
-    type: 'browse_dctn',
-    payload: action.payload
-  });
-};
-
-arq['get_raw_dctns_list'] = function(arg) {
-  var action, state;
-  state = arg.state, action = arg.action;
-  state = state.setIn(['desires', shortid()], {
-    type: 'get_raw_dctns_list'
-  });
-  return state.setIn(['get_dctns_list_state'], 'sent_request');
-};
-
-arq['lookup_prefix'] = function(arg) {
-  var action, state;
-  state = arg.state, action = arg.action;
-  return state.setIn(['desires', shortid()], {
-    type: 'lookup_prefix',
-    payload: action.payload
+    type: 'get_books',
+    payload: null
   });
 };
 
@@ -47792,6 +47779,15 @@ exports["default"] = side_effects_f;
 var arq;
 
 arq = {};
+
+arq['get_books'] = function(arg) {
+  var desire, state;
+  desire = arg.desire, state = arg.state;
+  return primus.write({
+    type: 'get_books',
+    payload: null
+  });
+};
 
 arq['apply_parse_build_data_structure'] = function(arg) {
   var desire, state;
@@ -47884,156 +47880,130 @@ exports["default"] = connect(map_state_to_props, map_dispatch_to_props)(comp);
 /* 253 */
 /***/ (function(module, exports) {
 
-var apply_algo_panel, browse_raw, comp, list_of_components, map_dispatch_to_props, map_state_to_props, raw_dctn_pane;
+var authors_table, books_table, comp, map_dispatch_to_props, map_state_to_props;
 
-list_of_components = {
-  'raw dictionary list': 'aeu',
-  'browse dictionary list pane': 'sth'
-};
+authors_table = function(props, state) {};
 
-raw_dctn_pane = function(props, state, setState) {
-  var idx, v;
+books_table = function(props, state) {
+  var authors, book, description, isbn, title;
   return div({
     style: {
       display: 'flex',
+      backgroundColor: 'magenta'
+    }
+  }, div({
+    style: {
+      backgroundColor: 'grey',
+      display: 'flex',
       flexDirection: 'column',
-      alignItems: 'start',
-      justifyContent: 'start',
-      background: 'palegreen',
-      width: '8%',
-      height: '60%'
+      flexWrap: 'no-wrap',
+      width: '100%'
     }
-  }, h4({
+  }, div({
     style: {
-      color: 'orange'
+      display: 'flex',
+      flexDirection: 'row',
+      flexGrow: 0
     }
-  }, "raw dictionaries"), div({
+  }, div({
     style: {
-      marginTop: 10
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
     }
-  }, (function() {
-    var i, len, ref, results;
-    ref = props.raw_dctns_list;
+  }, "Title"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "ISBN"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "Authors"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "Description")), (function() {
+    var ref, results;
+    ref = props.books;
     results = [];
-    for (idx = i = 0, len = ref.length; i < len; idx = ++i) {
-      v = ref[idx];
-      results.push((function(_this) {
-        return function(v) {
-          return p({
-            onClick: function(e) {
-              c(v);
-              setState({
-                dctn_selected: v.filename
-              });
-              return props.browse_dctn(v.filename);
-            },
-            style: {
-              color: v.filename === state.dctn_selected ? 'white' : 'black',
-              cursor: 'pointer',
-              fontSize: 10,
-              margin: 0,
-              marginTop: 5,
-              marginLeft: 10
-            },
-            key: "dctns_filename" + idx
-          }, v.filename.split('.')[0]);
-        };
-      })(this)(v));
+    for (isbn in ref) {
+      book = ref[isbn];
+      if (isbn !== 'isbn') {
+        title = book.title, isbn = book.isbn, authors = book.authors, description = book.description;
+        results.push(div({
+          key: "book:" + isbn,
+          style: {
+            display: 'flex',
+            flexDirection: 'row',
+            flexGrow: 0,
+            fontSize: 8
+          }
+        }, div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, title), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, isbn), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, authors), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, description)));
+      } else {
+        results.push(void 0);
+      }
     }
     return results;
-  }).call(this)));
-};
-
-browse_raw = function(props, state) {
-  var idx, word;
-  return div({
-    style: {
-      background: 'chartreuse',
-      minWidth: '10%',
-      scroll: 'auto'
-    }
-  }, (function() {
-    var i, len, ref, results;
-    ref = props.dctn_blob.split('\n');
-    results = [];
-    for (idx = i = 0, len = ref.length; i < len; idx = ++i) {
-      word = ref[idx];
-      results.push(p({
-        style: {
-          margin: 4,
-          fontSize: 8
-        },
-        key: "word" + idx
-      }, "   " + word));
-    }
-    return results;
-  })());
-};
-
-apply_algo_panel = function(props, state, setState) {
-  c(state.dctn_selected);
-  return div({
-    style: {
-      background: 'magenta'
-    }
-  }, h4({
-    style: {
-      color: 'blue'
-    }
-  }, "Apply algo:"), div(null, button({
-    onClick: function() {
-      return setState({
-        algo_selected: 'burkhard-keller_tree'
-      });
-    },
-    style: {
-      cursor: 'pointer',
-      background: state.algo_selected === 'bktree' ? 'white' : 'darkgrey'
-    }
-  }, "burkhard-keller tree")), div(null, button({
-    onClick: function() {
-      return setState({
-        algo_selected: 'char-tree-autocomplete'
-      });
-    },
-    style: {
-      cursor: 'pointer',
-      background: state.algo_selected === 'char-tree-autocomplete' ? 'white' : 'darkgrey'
-    }
-  }, "char-tree autocomplete")), h4({
-    style: {
-      color: 'blue'
-    }
-  }, "to " + state.dctn_selected + " "), button({
-    onClick: function() {
-      return props.apply_parse_build_data_structure(state.dctn_selected, state.algo_selected);
-    },
-    style: {
-      cursor: 'pointer',
-      backgroundColor: ((state.dctn_selected !== 'null') && (state.algo_selected !== 'null')) ? 'white' : 'red'
-    }
-  }, "Go"));
+  })()));
 };
 
 comp = rr({
   getInitialState: function() {
-    return {
-      dctn_selected: 'null',
-      algo_selected: 'null'
-    };
+    return {};
   },
   componentWillMount: function() {
-    return this.props.get_raw_dctns_list();
+    this.props.get_books();
+    return this.props.get_authors();
   },
   render: function() {
     return div({
       style: {
         display: 'flex',
+        flexDirection: 'column',
         backgroundColor: 'lightsteelblue',
         height: '100%',
         width: '100%'
       }
-    }, raw_dctn_pane(this.props, this.state, this.setState.bind(this)), browse_raw(this.props, this.state), apply_algo_panel(this.props, this.state, this.setState.bind(this)));
+    }, h6(null, 'books'), books_table(this.props, this.state), h6(null, 'authors'), authors_table(this.props, this.state));
   }
 });
 
@@ -48043,51 +48013,14 @@ map_state_to_props = function(state) {
 
 map_dispatch_to_props = function(dispatch) {
   return {
-    apply_parse_build_data_structure: function(filename, algo_name) {
+    get_authors: function() {
       return dispatch({
-        type: 'apply_parse_build_data_structure',
-        payload: {
-          filename: filename,
-          algo_name: algo_name
-        }
+        type: 'get_authors_and_magazines'
       });
     },
-    browse_dctn: function(filename) {
+    get_books: function() {
       return dispatch({
-        type: 'browse_dctn',
-        payload: {
-          filename: filename
-        }
-      });
-    },
-    get_raw_dctns_list: function() {
-      return dispatch({
-        type: 'get_raw_dctns_list'
-      });
-    },
-    change_to_autocomplete_mode: function() {
-      return dispatch({
-        type: 'change_to_autocomplete_mode'
-      });
-    },
-    change_to_spellcheck_mode: function() {
-      return dispatch({
-        type: 'change_to_spellcheck_mode'
-      });
-    },
-    lookup_prefix: function(arg) {
-      var payload;
-      payload = arg.payload;
-      return dispatch({
-        type: 'lookup_prefix',
-        payload: payload
-      });
-    },
-    placeholder: function(arg) {
-      var payload;
-      payload = arg.payload;
-      return dispatch({
-        type: 'placeholder'
+        type: 'get_books'
       });
     }
   };

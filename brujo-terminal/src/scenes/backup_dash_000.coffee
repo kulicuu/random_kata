@@ -5,149 +5,158 @@
 # main meta hash of that.
 
 
+# NOTE to reduce the work for the moment we'll just read in all the dictionaries as lists
+# on the server side on startup.  then these can be applied to various parser/data-strucutre-factories
+# and these can be browsed and tested
 
-select_file_load = (props, state) ->
+
+list_of_components =
+    'raw dictionary list': 'aeu'
+    'browse dictionary list pane': 'sth'
+
+
+
+
+
+
+raw_dctn_pane = (props, state, setState) ->
     div
         style:
             display: 'flex'
-            background: 'lime'
-            width: 200
-            height: 300
+            flexDirection: 'column'
+            alignItems: 'start'
+            justifyContent: 'start'
+            background: 'palegreen'
+            width: '8%'
+            height: '60%'
+        h4
+            style:
+                color: 'orange'
+            "raw dictionaries"
+        div
+            style:
+                marginTop: 10
+            for v, idx in props.raw_dctns_list
+                do (v) =>
+                    p
+                        onClick: (e) =>
+                            c v
+                            setState
+                                dctn_selected: v.filename
+                            props.browse_dctn v.filename
+                        style:
+                            color: if v.filename is state.dctn_selected
+                                'white'
+                            else
+                                'black'
+                            cursor: 'pointer'
+                            fontSize: 10
+                            margin: 0
+                            marginTop: 5
+                            marginLeft: 10
+                        key: "dctns_filename#{idx}"
+                        v.filename.split('.')[0]
 
 
 
-browse_pane = (props, state) ->
+browse_raw = (props, state) ->
     div
         style:
-            display: 'flex'
-            background: 'blue'
-        textarea
-            width: 100
-            height: 100
+            background: 'chartreuse'
+            minWidth: '10%'
+            scroll: 'auto'
+        for word, idx in props.dctn_blob.split('\n')
+            p
+                style:
+                    margin: 4
+                    fontSize: 8
+                key: "word#{idx}"
+                "   #{word}"
+
+
+
+
+
+
+apply_algo_panel = (props, state, setState) ->
+    c state.dctn_selected
+    div
+        style:
+            background: 'magenta'
+        h4
+            style:
+                color: 'blue'
+            "Apply algo:"
+        div null,
+            button
+                onClick: ->
+                    setState
+                        algo_selected: 'burkhard-keller_tree'
+                style:
+                    cursor: 'pointer'
+                    background: if state.algo_selected is 'bktree' then 'white' else 'darkgrey'
+                "burkhard-keller tree"
+        div null,
+            button
+                onClick: ->
+                    setState
+                        algo_selected: 'char-tree-autocomplete'
+                style:
+                    cursor: 'pointer'
+                    background: if state.algo_selected is 'char-tree-autocomplete' then 'white' else 'darkgrey'
+                "char-tree autocomplete"
+        h4
+            style:
+                color: 'blue'
+            "to #{state.dctn_selected} "
+        button
+            onClick: ->
+                props.apply_parse_build_data_structure(state.dctn_selected, state.algo_selected)
+            style:
+                cursor: 'pointer'
+                backgroundColor: if ( ( state.dctn_selected isnt 'null') and (state.algo_selected isnt 'null') ) then 'white' else 'red'
+            "Go"
 
 
 
 comp = rr
+
+    getInitialState: ->
+        dctn_selected: 'null'
+        algo_selected: 'null'
+
+
+
+    componentWillMount: ->
+        # c 'okay'
+        @props.get_raw_dctns_list()
+
     render: ->
-        # c @props.match, '@props.match'
         div
             style:
                 display: 'flex'
-                flexDirection: 'column'
-                alignItems: 'center'
-                justifyContent: 'center'
-                backgroundColor: 'ivory'
+                # flexDirection: 'column'
+                # alignItems: 'center'
+                # justifyContent: 'center'
+                backgroundColor: 'lightsteelblue'
                 height: '100%'
+                width: '100%'
+            raw_dctn_pane @props, @state, @setState.bind(@)
 
-            div
-                style:
-                    display: 'flex'
+            # c @props
+            browse_raw @props, @state
+            # div null,
+            #     for word, idx in @props.dctn_blob.split('\n')
+            #         p
+            #             style:
+            #                 margin: 4
+            #                 fontSize: 8
+            #             key: "word#{idx}"
+            #             "   #{word}"
+            # "aeosunth"
 
-                div
-                    style:
-                        display: 'flex'
-                        background: 'deepseagreen'
-                        width: '50%'
-                        height: '50%'
-                    input
-                        type: 'file'
-                        # "load dictionary list"
 
-                div
-                    style:
-                        display: 'flex'
-                        background: 'grey'
-                        height: 100
-                        width: 40
-                        flexDirection: 'column'
-                    for idx in [0 .. 40]
-                        p
-                            key: "idex#{idx}"
-                            style:
-                                fontSize: 8
-                                margin: 0
-                            'hello'
-                div
-                    style:
-                        display: 'flex'
-                        width: 100
-                        height: 100
-                        background: 'purple'
-                    svg
-                        width: '100%'
-                        height: '100%'
-                        rect
-                            width: '49%'
-                            height: '50%'
-                            x: '2%'
-                            y: '30%'
-                            fill: 'lightgreen'
-                button
-                    style:
-                        background: 'magenta'
-                    "maven"
-            div
-                style:
-                    display: 'flex'
-                div
-                    style:
-                        display: 'flex'
-                        width: 100
-                        height: 100
-                        background: 'red'
-                select_file_load()
-                button
-                    style:
-                        background: 'green'
-                        cursor: 'pointer'
-                    "browse library"
-                button
-                    style:
-                        background: 'grey'
-                        cursor: 'pointer'
-                    "load dictionary"
-                button
-                    style:
-                        background: 'grey'
-                        cursor: 'pointer'
-                    "select algo"
-                browse_pane @props, @state
-            div
-                style:
-                    display: 'flex'
-                div
-                    style:
-                        display: 'flex'
-
-                    button
-                        style:
-                            background: 'red'
-                        'autocomplete'
-                    button
-                        onClick: =>
-                            @props.change_to_spellcheck_mode
-                        style:
-                            background: 'cyan'
-                        'spellcheck'
-                input
-                    type: 'text'
-                    # color: 'grey'
-                    onChange: (e) =>
-                        c 'e', e.currentTarget.value
-                        @props.lookup_prefix
-                            payload:
-                                prefix_text: e.currentTarget.value
-                    placeholder: 'prefix'
-
-                h3
-                    style:
-                        fontSize: 14
-                        color: 'grey'
-                    if (@props.match is 'Not found.') or (@props.match is '')
-                        @props.match
-                    else
-                        @props.match.match_word
-
+            apply_algo_panel @props, @state, @setState.bind(@)
 
 
 
@@ -162,6 +171,23 @@ map_state_to_props = (state) ->
     state.get('lookup').toJS()
 
 map_dispatch_to_props = (dispatch) ->
+
+    apply_parse_build_data_structure: (filename, algo_name) ->
+        dispatch
+            type: 'apply_parse_build_data_structure'
+            payload:
+                filename: filename
+                algo_name: algo_name
+
+    browse_dctn: (filename) ->
+        dispatch
+            type: 'browse_dctn'
+            payload:
+                filename: filename
+
+    get_raw_dctns_list: ->
+        dispatch
+            type: 'get_raw_dctns_list'
 
 
     change_to_autocomplete_mode: ->

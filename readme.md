@@ -1,5 +1,5 @@
 
-
+# a random kata adapted from my autocorrect/spellcheck project
 
 #### prereqs
 
