@@ -7,6 +7,12 @@ pack =
 
 kata_api = {}
 
+kata_api['get_authors_and_magazines'] = ({ spark }) ->
+    spark.write
+        type: 'get_authors_and_magazines_response'
+        payload:
+            authors: pack.authors
+            magazines: pack.magazines
 
 kata_api.get_books = ({ spark }) ->
     spark.write

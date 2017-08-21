@@ -17,6 +17,10 @@ arq = {}
 #         type: 'send_message'
 #         payload: desire.payload
 
+arq['get_authors_and_magazines'] = ->
+    primus.write
+        type: 'get_authors_and_magazines'
+
 
 arq['get_books'] = ({ desire, state }) ->
     primus.write

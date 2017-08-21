@@ -47683,6 +47683,15 @@ arq['primus:data'] = function(arg) {
   }
 };
 
+arq['get_authors_and_magazines'] = function(arg) {
+  var action, state;
+  state = arg.state, action = arg.action;
+  return state.setIn(['desires', shortid()], {
+    type: 'get_authors_and_magazines',
+    payload: null
+  });
+};
+
 arq['get_books'] = function(arg) {
   var action, state;
   state = arg.state, action = arg.action;
@@ -47779,6 +47788,12 @@ exports["default"] = side_effects_f;
 var arq;
 
 arq = {};
+
+arq['get_authors_and_magazines'] = function() {
+  return primus.write({
+    type: 'get_authors_and_magazines'
+  });
+};
 
 arq['get_books'] = function(arg) {
   var desire, state;
@@ -47880,9 +47895,97 @@ exports["default"] = connect(map_state_to_props, map_dispatch_to_props)(comp);
 /* 253 */
 /***/ (function(module, exports) {
 
-var authors_table, books_table, comp, map_dispatch_to_props, map_state_to_props;
+var authors_table, books_table, comp, magazines_table, map_dispatch_to_props, map_state_to_props;
 
-authors_table = function(props, state) {};
+magazines_table = function(props, state) {};
+
+authors_table = function(props, state) {
+  var author, email, firstname, lastname;
+  return div({
+    style: {
+      display: 'flex',
+      backgroundColor: 'magenta'
+    }
+  }, div({
+    style: {
+      backgroundColor: 'grey',
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'no-wrap',
+      width: '100%'
+    }
+  }, div({
+    style: {
+      display: 'flex',
+      flexDirection: 'row',
+      flexGrow: 0
+    }
+  }, div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "First Name"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "Last Name"), div({
+    style: {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      paddingRight: 20
+    }
+  }, "Email")), (function() {
+    var ref, results;
+    ref = props.authors;
+    results = [];
+    for (email in ref) {
+      author = ref[email];
+      if (email !== 'email') {
+        email = author.email, firstname = author.firstname, lastname = author.lastname;
+        results.push(div({
+          key: "book:" + email,
+          style: {
+            display: 'flex',
+            flexDirection: 'row',
+            flexGrow: 0,
+            fontSize: 8
+          }
+        }, div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, firstname), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, lastname), div({
+          style: {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            paddingRight: 20
+          }
+        }, email)));
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  })()));
+};
 
 books_table = function(props, state) {
   var authors, book, description, isbn, title;

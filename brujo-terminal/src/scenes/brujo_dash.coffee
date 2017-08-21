@@ -2,7 +2,79 @@
 
 
 
+magazines_table = ( props, state ) ->
+
+
 authors_table = ( props, state ) ->
+    div
+        style:
+            display: 'flex'
+            backgroundColor: 'magenta'
+
+        div
+            style:
+                backgroundColor: 'grey'
+                display: 'flex'
+                flexDirection: 'column'
+                flexWrap: 'no-wrap'
+                width: '100%'
+            div
+                style:
+                    display: 'flex'
+                    flexDirection: 'row'
+                    flexGrow: 0
+                div
+                    style:
+                        overflow: 'hidden'
+                        whiteSpace: 'nowrap'
+                        textOverflow: 'ellipsis'
+                        paddingRight: 20
+                    "First Name"
+                div
+                    style:
+                        overflow: 'hidden'
+                        whiteSpace: 'nowrap'
+                        textOverflow: 'ellipsis'
+                        paddingRight: 20
+                    "Last Name"
+                div
+                    style:
+                        overflow: 'hidden'
+                        whiteSpace: 'nowrap'
+                        textOverflow: 'ellipsis'
+                        paddingRight: 20
+                    "Email"
+            for email, author of props.authors
+                if email isnt 'email'
+                    { email, firstname, lastname }  = author
+                    div
+                        key: "book:#{email}"
+                        style:
+                            display: 'flex'
+                            flexDirection: 'row'
+                            flexGrow: 0
+                            fontSize: 8
+                        div
+                            style:
+                                overflow: 'hidden'
+                                whiteSpace: 'nowrap'
+                                textOverflow: 'ellipsis'
+                                paddingRight: 20
+                            firstname
+                        div
+                            style:
+                                overflow: 'hidden'
+                                whiteSpace: 'nowrap'
+                                textOverflow: 'ellipsis'
+                                paddingRight: 20
+                            lastname
+                        div
+                            style:
+                                overflow: 'hidden'
+                                whiteSpace: 'nowrap'
+                                textOverflow: 'ellipsis'
+                                paddingRight: 20
+                            email
 
 
 

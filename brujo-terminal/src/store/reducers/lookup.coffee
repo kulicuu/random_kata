@@ -78,7 +78,10 @@ arq['primus:data'] = ({ state, action }) ->
         state
 
 
-
+arq['get_authors_and_magazines'] = ({ state, action }) ->
+    state.setIn ['desires', shortid()],
+        type: 'get_authors_and_magazines'
+        payload: null
 
 arq['get_books'] = ({ state, action }) ->
     state.setIn ['desires', shortid()],
