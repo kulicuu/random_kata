@@ -47895,28 +47895,35 @@ exports["default"] = connect(map_state_to_props, map_dispatch_to_props)(comp);
 /* 253 */
 /***/ (function(module, exports) {
 
-var authors_table, books_table, comp, find_book_or_mag_pane, keys_books, keys_mags, magazines_table, map_dispatch_to_props, map_state_to_props;
+var authors_books, authors_mags, authors_table, books_table, comp, find_book_or_mag_pane, keys_books, keys_mags, magazines_table, map_dispatch_to_props, map_state_to_props;
 
 keys_books = null;
 
 keys_mags = null;
+
+authors_books = {};
+
+authors_mags = {};
 
 find_book_or_mag_pane = function(props, state, setState) {
   var book, idx, mag;
   return div({
     style: {
       display: 'flex',
+      flexDirection: 'column',
       backgroundColor: 'lightgrey'
+    }
+  }, div({
+    style: {
+      display: 'flex'
     }
   }, input({
     type: 'text',
     placeholder: 'isbn',
     onChange: function(e) {
-      var books_matches, candide_isbn, len, mags_matches, total_rayy;
+      var books_matches, candide_isbn, len, mags_matches;
       candide_isbn = e.currentTarget.value;
       len = candide_isbn.length;
-      total_rayy = keys_mags.concat(keys_books);
-      c(total_rayy);
       books_matches = _.reduce(keys_books, function(acc, v, idx) {
         c(acc, v, idx);
         if (v.substring(0, len) === candide_isbn) {
@@ -47934,8 +47941,6 @@ find_book_or_mag_pane = function(props, state, setState) {
           return acc;
         }
       }, []);
-      c(mags_matches);
-      c(books_matches);
       return setState({
         mags_matches: mags_matches,
         books_matches: books_matches
@@ -47981,7 +47986,39 @@ find_book_or_mag_pane = function(props, state, setState) {
       }, book.title));
     }
     return results;
-  })()));
+  })())), div({
+    style: {
+      display: 'flex'
+    }
+  }, input({
+    type: 'text',
+    placeholder: 'author',
+    onChange: function(e) {
+      var candide, email_matches_books, email_matches_mags, len;
+      candide = e.currentTarget.value;
+      len = candide.length;
+      email_matches_books = _.reduce(_.keys(authors_books), function(acc, v, k) {
+        if (v.authors.substring(0, len) === candide) {
+          acc[v.isbn] = v;
+          return acc;
+        } else {
+          return acc;
+        }
+      }, {});
+      return email_matches_mags = _.reduce(_.keys(authors_books), function(acc, v, k) {
+        if (v.authors.substring(0, len) === candide) {
+          acc[v.isbn] = v;
+          return acc;
+        } else {
+          return acc;
+        }
+      }, {});
+    }
+  }), div({
+    style: {
+      display: 'flex'
+    }
+  })));
 };
 
 magazines_table = function(props, state) {
@@ -48280,8 +48317,21 @@ comp = rr({
   componentWillReceiveProps: function(props, state) {
     if (_.includes(_.keys(props), 'books')) {
       keys_books = _.keys(props.books);
+      c(props.books);
+      authors_books = _.reduce(props.books, function(acc, v, k) {
+        if (!_.includes(_.keys(acc), v.authors)) {
+          acc[v.authors] = {};
+        }
+        return acc[v.authors][v.isbn] = v;
+      }, {});
     }
     if (_.includes(_.keys(props), 'magazines')) {
+      authors_mags = _.reduce(props.magazines, function(acc, v, k) {
+        if (!_.includes(_.keys(acc), v.authors)) {
+          acc[v.authors] = {};
+        }
+        return acc[v.authors][v.isbn] = v;
+      }, {});
       return keys_mags = _.keys(props.magazines);
     }
   },
@@ -48304,7 +48354,7 @@ comp = rr({
         height: '100%',
         width: '100%'
       }
-    }, h6(null, 'books'), books_table(this.props, this.state), h6(null, 'authors'), authors_table(this.props, this.state), h6(null, 'magazines'), magazines_table(this.props, this.state), h6(null, 'find book or mag'), find_book_or_mag_pane(this.props, this.state, this.setState.bind(this)));
+    }, h6(null, 'books'), books_table(this.props, this.state), h6(null, 'authors'), authors_table(this.props, this.state), h6(null, 'magazines'), magazines_table(this.props, this.state), h6(null, "find book or mag (by isbn or author's email)"), find_book_or_mag_pane(this.props, this.state, this.setState.bind(this)));
   }
 });
 
