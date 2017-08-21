@@ -78,23 +78,56 @@ find_book_or_mag_pane = ( props, state, setState ) ->
                 onChange: (e) ->
                     candide = e.currentTarget.value
                     len = candide.length
-                    email_matches_books = _.reduce _.keys(authors_books), (acc, v, k) ->
-                        if v.authors.substring(0, len) is candide
+                    c props.books, ',.383'
+                    c props.magazines, '...'
+                    email_matches_books = _.reduce props.books, (acc, v, k) ->
+                        c v
+                        if not _.includes(_.keys(v), 'authors')
+                            acc
+                        else if v.authors.substring(0, len) is candide
                             acc[v.isbn] = v
                             acc
                         else
                             acc
                     , {}
-                    email_matches_mags = _.reduce _.keys(authors_books), (acc, v, k) ->
-                        if v.authors.substring(0, len) is candide
+                    email_matches_mags = _.reduce props.magazines, (acc, v, k) ->
+                        c v
+                        if not _.includes(_.keys(v), 'authors')
+                            acc
+                        else if v.authors.substring(0, len) is candide
                             acc[v.isbn] = v
                             acc
                         else
                             acc
                     , {}
+                    setState
+                        email_matches_mags: email_matches_mags
+                        email_matches_books: email_matches_books
+                    c state
             div
                 style:
                     display: 'flex'
+                h6
+                    style:
+                        fontSize: 8
+                    'email magazine matches'
+                for isbn, mag of state.email_matches_mags
+                    c mag
+                    p
+                        key: "email_mag_match#{isbn}"
+                        style:
+                            fontSize: 7
+                        mag.title
+                h6
+                    style:
+                        fontSize: 8
+                    'email book matches'
+                for isbn, book of state.email_matches_books
+                    p
+                        key: "email_book_match#{isbn}"
+                        style:
+                            fontSize: 7
+                        book.title
 
 
 
@@ -373,6 +406,8 @@ comp = rr
     getInitialState: ->
         mags_matches: []
         books_matches: []
+        email_matches_mags: {}
+        email_matches_books: {}
 
 
 

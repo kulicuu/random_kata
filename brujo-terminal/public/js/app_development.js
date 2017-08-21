@@ -47906,7 +47906,7 @@ authors_books = {};
 authors_mags = {};
 
 find_book_or_mag_pane = function(props, state, setState) {
-  var book, idx, mag;
+  var book, idx, isbn, mag;
   return div({
     style: {
       display: 'flex',
@@ -47997,28 +47997,78 @@ find_book_or_mag_pane = function(props, state, setState) {
       var candide, email_matches_books, email_matches_mags, len;
       candide = e.currentTarget.value;
       len = candide.length;
-      email_matches_books = _.reduce(_.keys(authors_books), function(acc, v, k) {
-        if (v.authors.substring(0, len) === candide) {
+      c(props.books, ',.383');
+      c(props.magazines, '...');
+      email_matches_books = _.reduce(props.books, function(acc, v, k) {
+        c(v);
+        if (!_.includes(_.keys(v), 'authors')) {
+          return acc;
+        } else if (v.authors.substring(0, len) === candide) {
           acc[v.isbn] = v;
           return acc;
         } else {
           return acc;
         }
       }, {});
-      return email_matches_mags = _.reduce(_.keys(authors_books), function(acc, v, k) {
-        if (v.authors.substring(0, len) === candide) {
+      email_matches_mags = _.reduce(props.magazines, function(acc, v, k) {
+        c(v);
+        if (!_.includes(_.keys(v), 'authors')) {
+          return acc;
+        } else if (v.authors.substring(0, len) === candide) {
           acc[v.isbn] = v;
           return acc;
         } else {
           return acc;
         }
       }, {});
+      setState({
+        email_matches_mags: email_matches_mags,
+        email_matches_books: email_matches_books
+      });
+      return c(state);
     }
   }), div({
     style: {
       display: 'flex'
     }
-  })));
+  }, h6({
+    style: {
+      fontSize: 8
+    }
+  }, 'email magazine matches'), (function() {
+    var ref, results;
+    ref = state.email_matches_mags;
+    results = [];
+    for (isbn in ref) {
+      mag = ref[isbn];
+      c(mag);
+      results.push(p({
+        key: "email_mag_match" + isbn,
+        style: {
+          fontSize: 7
+        }
+      }, mag.title));
+    }
+    return results;
+  })(), h6({
+    style: {
+      fontSize: 8
+    }
+  }, 'email book matches'), (function() {
+    var ref, results;
+    ref = state.email_matches_books;
+    results = [];
+    for (isbn in ref) {
+      book = ref[isbn];
+      results.push(p({
+        key: "email_book_match" + isbn,
+        style: {
+          fontSize: 7
+        }
+      }, book.title));
+    }
+    return results;
+  })())));
 };
 
 magazines_table = function(props, state) {
@@ -48338,7 +48388,9 @@ comp = rr({
   getInitialState: function() {
     return {
       mags_matches: [],
-      books_matches: []
+      books_matches: [],
+      email_matches_mags: {},
+      email_matches_books: {}
     };
   },
   componentWillMount: function() {
