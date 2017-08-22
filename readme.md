@@ -1,7 +1,7 @@
 
-# a random kata adapted from my autocorrect/spellcheck project
+# a random kata adapted from my graph search autocorrect/spellcheck project
 
-https://github.com/kulicuu/autocomplete_and_cetera
+https://github.com/kulicuu/graph_radar
 
 #### prereqs
 
